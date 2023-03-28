@@ -1,0 +1,3 @@
+/Users/gowtham/Desktop/courses/INF-585/inf585_code/scenes_inf585/up/build/CMakeFiles/up.dir
+/Users/gowtham/Desktop/courses/INF-585/inf585_code/scenes_inf585/up/build/CMakeFiles/edit_cache.dir
+/Users/gowtham/Desktop/courses/INF-585/inf585_code/scenes_inf585/up/build/CMakeFiles/rebuild_cache.dir
