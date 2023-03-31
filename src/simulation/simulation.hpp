@@ -28,39 +28,10 @@ struct house_structure
     // wire_structure wire;
 };
 
-struct wire_structure
-{    
-    // Buffers are stored as 2D grid that can be accessed as grid(ku,kv)
-    cgp::numarray<cgp::vec3> position;  
-    cgp::numarray<cgp::vec3> velocity;  
-    cgp::numarray<cgp::vec3> force;
-
-
-    
-    void initialize(int N_sample_edge, cgp::vec3 initial_pos);  // Initialize a square flat wire
-    int N_samples() const;      // Number of vertex along one dimension of the grid
-};
-
-void simulate(std::vector<particle_structure>& particles, float dt);
-bool simulate1(house_structure & house, std::vector<particle_structure>& particles, float dt, std::vector<wire_structure>& wires);
-
-
-void collision_sphere_plane(house_structure& particle, cgp::vec3 const& n_plane, cgp::vec3 const& p0_plane);
-void collision_sphere_sphere(particle_structure& particle_1, particle_structure& particle_2);
-void collision_balloon_balloon(particle_structure& particle_1, particle_structure& particle_2);
 
 
 
 
-struct wire_structure_drawable
-{
-    cgp::curve_drawable drawable;
-
-    void initialize(int N_sample_edge, cgp::vec3 initial_pos);
-    void update(wire_structure const& wire);
-};
-
-void draw(wire_structure_drawable const& wire_drawable, environment_generic_structure const& environment);
 // void draw_wireframe(wire_structure_drawable const& wire_drawable, environment_generic_structure const& environment);
 
 // Parameter attached to a fixed vertex (ku,kv) coordinates + 3D position
@@ -87,17 +58,49 @@ struct constraint_structure
     void update_fixed_position(int ku, cgp::vec3 const& v);
 };
 
+struct wire_structure
+{    
+    // Buffers are stored as 2D grid that can be accessed as grid(ku,kv)
+    cgp::numarray<cgp::vec3> position;  
+    cgp::numarray<cgp::vec3> velocity;  
+    cgp::numarray<cgp::vec3> force;
+
+
+    
+    void initialize(int N_sample_edge, cgp::vec3 initial_pos);  // Initialize a square flat wire
+    int N_samples() const;      // Number of vertex along one dimension of the grid
+};
+
+void simulate(std::vector<particle_structure>& particles, float dt);
+bool simulate1(house_structure & house, std::vector<particle_structure>& particles, float dt, std::vector<wire_structure>& wires, std::vector<constraint_structure> &constraints);
+
+
+void collision_sphere_plane(house_structure& particle, cgp::vec3 const& n_plane, cgp::vec3 const& p0_plane);
+void collision_sphere_sphere(particle_structure& particle_1, particle_structure& particle_2);
+void collision_balloon_balloon(particle_structure& particle_1, particle_structure& particle_2);
+
+struct wire_structure_drawable
+{
+    cgp::curve_drawable drawable;
+
+    void initialize(int N_sample_edge, cgp::vec3 initial_pos);
+    void update(wire_structure const& wire);
+};
+
+void draw(wire_structure_drawable const& wire_drawable, environment_generic_structure const& environment);
+
+
 
 struct simulation_parameters
 {
     float dt = 0.005f;        // time step for the numerical integration
     float mass_total = 0.1f; // total mass of the wire
-    float K = 20.0f;         // stiffness parameter
+    float K = 5.0f;         // stiffness parameter
     float mu = 15.0f;        // damping parameter
 
     //  Wind magnitude and direction
     struct {
-        float magnitude = 0.0f;
+        float magnitude = 1.0f;
         cgp::vec3 direction = { 0,-1,0 };
     } wind;
 };

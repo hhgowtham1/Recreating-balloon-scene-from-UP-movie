@@ -10,10 +10,11 @@ void scene_structure::initialize()
 {
 	camera_control.initialize(inputs, window); // Give access to the inputs and window global state to the camera controler
 	camera_control.set_rotation_axis_z();
-	camera_control.look_at({ 3.0f, 2.0f, 2.0f }, {0,0,0}, {0,0,1});
+	
+	// camera_control.look_at({ 3.0f, 2.0f, 2.0f }, {0,0,0}, {0,0,1});
 	// global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 	
-	camera_control.camera_model.manipulator_scale_distance_to_center(25.f+20.f);
+	// camera_control.camera_model.manipulator_scale_distance_to_center(25.f+20.f);
 
 	timer.event_period = 1.0f;
 
@@ -38,8 +39,12 @@ void scene_structure::initialize()
 		h_mesh.position[k]= h_mesh.position[k]-vec3{center.x,0.f,center.z} ;
 		// h_mesh.position[k].xy()= h_mesh.position[k].xy()-center.xy() ;
 		// h_mesh.position[k].y= h_mesh.position[k].y-center.y ;
-		std::cout<<h_mesh.position[k]<<std::endl;
+		// std::cout<<h_mesh.position[k]<<std::endl;
 	}
+	camera_control.look_at(-6*vec3(center.x,center.y,center.z),center);
+	camera_control.camera_model.center_of_rotation = {0,0,0};
+	camera_control.camera_model.manipulator_translate_front(5);
+	// camera_controller_orbit=(center);
 	house_mesh.initialize_data_on_gpu(h_mesh);
 	house_mesh.texture.load_and_initialize_texture_2d_on_gpu(project::path+"assets/woodfloor.jpg");
 	house_mesh.model.rotation= rotation_transform::from_axis_angle({ 1,0,0 }, 3.14f/2);
@@ -48,7 +53,7 @@ void scene_structure::initialize()
 	// house_mesh.model.rotation= rotation_transform::from_axis_angle({ 0,0,0 }, 3.14f/2);
 	// house_mesh.model.translation= center;
 
-	std::cout<<center<<std::endl;
+	// std::cout<<center<<std::endl;
 	
 	// house_mesh.model.translation = {100,0,0} ;
 	floor.initialize_data_on_gpu(mesh_primitive_quadrangle({ -1.5f,-1.5f,0 }, { -1.5f,1.5f,0 }, { 1.5f,1.5f,0 }, { 1.5f,-1.5f,0 }));
@@ -107,7 +112,7 @@ void scene_structure::initialize_wire(int N_sample,particle_structure &particle)
 	constraint.fixed_sample.clear();
 	constraint.add_fixed_position(0, particle);
 		// size_t  const N = house_.p;
-	cgp::vec3 center = cgp::vec3(0.f,0.f,80.f);//house_.p+vec3{0,0,70.f};//+vec3{30.f,-36.f,90.f};//cgp::vec3(0.,0.,0.);//h_mesh.position.colwise().mean();
+	cgp::vec3 center = house_.p+cgp::vec3(0.f,0.f,80.f);//house_.p+vec3{0,0,70.f};//+vec3{30.f,-36.f,90.f};//cgp::vec3(0.,0.,0.);//h_mesh.position.colwise().mean();
 	// std::cout<<house_.p<<std::endl;
 	// for (size_t k = 0; k < N; ++k)
 	// {
@@ -135,7 +140,7 @@ void scene_structure::display_frame()
 draw(floor, environment);
 	// Create a new particle if needed
 	// for(int i=0; i<100; i++)
-	// if(particles.size()<100)
+	// if(particles.size()<2)
 	emit_particle();
 
 
@@ -144,7 +149,8 @@ draw(floor, environment);
 	// simulate(particles, dt);
 	// std::cout<<"comes here"<<std::endl;
 	if(particles.size()!=0)
-	 gui.add_balloon=simulate1(house_, particles ,dt, wires);
+	 
+	 gui.add_balloon =  simulate1(house_, particles ,dt, wires, constraints);
 
 	
 	// Display the result
@@ -173,13 +179,13 @@ void scene_structure::house_display()
 	for (int k=0 ;k< wires.size(); k++)
 	{
 	constraint_structure &constraint = constraints.at(k);
-	constraint.update_fixed_position(wires.at(k).N_samples()-1, house_.p + vec3{0.f,5.f, 80.f + 80.f + 40.f } );//vec3{30,-36.f,90.f}
+	constraint.update_fixed_position(wires.at(k).N_samples()-1, house_.p + vec3{-8.f,5.f, 80.f + 80.f + 35.f } );//vec3{30,-36.f,90.f}
 	}
 	// cube_wireframe.model.translation = particle.p;
 	if(gui.show_house)
 	{
-	draw(cube_wireframe, environment);
-	
+	// draw(cube_wireframe, environment);
+	// camera_control.look_at()
 	draw(house_mesh, environment);
 	}
 }
@@ -218,20 +224,25 @@ void scene_structure::balloon_display()
 
 			// One step of numerical integration
 			simulation_numerical_integration(wire, parameters, parameters.dt);
-
+			// std::cout<<"size :"<<constraint.fixed_sample.size()<<std::endl;
+		// 	for (auto const& it : constraint.fixed_sample) {
+        // position_contraint c = it.second;
+		// 	// std::cout<<"constraint :"<<c.ku<<" "<<c.position<<std::endl;
+		// 	}
 			// Apply the positional (and velocity) constraints
 			simulation_apply_constraints(wire, constraint, particle);
 
 			// Check if the simulation has not diverged - otherwise stop it
-			bool const simulation_diverged = simulation_detect_divergence(wire);
-			if (simulation_diverged) {
-				std::cout << "\n *** Simulation has diverged ***" << std::endl;
-				std::cout << " > The simulation is stoped" << std::endl;
-				// simulation_running = false;
-			}
+			// bool const simulation_diverged = simulation_detect_divergence(wire);
+			// if (simulation_diverged) {
+			// 	std::cout << "\n *** Simulation has diverged ***" << std::endl;
+			// 	std::cout << " > The simulation is stoped" << std::endl;
+			// 	// simulation_running = false;
+			// }
 		}
 
-		// std::cout<<" "<<wire.position.data<<std::endl;
+		// std::cout<<"wire position "<<wire.position<<std::endl;
+		// std::cout<<wire.velocity<<std::endl;
 		wire_drawable.update(wire); // update the positions on the GPU
 
 		// Display the wire
@@ -251,16 +262,19 @@ void scene_structure::emit_particle()
 		// for(int xx= 0 ; xx< 100; xx++)
 	
 		float const theta = rand_interval(0, 2 * Pi);
-		vec3 const v = vec3(2.0f * std::cos(theta), 2.0f * std::sin(theta), 4.0f);
+		vec3 const v = vec3(1.0f * std::cos(theta), 1.0f * std::sin(theta), 20.0f);
 
 		particle_structure particle;
-		particle.p = vec3{0.f,5.f, 80.f + 80.f + 40.f};//house_.p+vec3{0,0,90.f};//vec3{30+12,-36.f,90.f}
+		// std::cout<<house_.p<<std::endl;
+		particle.p = house_.p+vec3{-8.f,5.f, 80.f + 80.f + 35.f};//house_.p+vec3{0,0,90.f};//vec3{30+12,-36.f,90.f}
 		particle.r = 3.f;
 		particle.c = color_lut[int(rand_interval() * color_lut.size())];
 		particle.v = v;
 		particle.m = 0.1f; //
 		particle.vol = (4.f/3.f) *  Pi * std::pow(particle.r,3); 
-		particle.l = 20.f+rand_interval(20.f, 60.f);
+		particle.l = 20.f+rand_interval(20.f, 80.f);
+		if(particles.size()<10)
+		particle.l-= 20.f;
 		// wire_structure wire;
 
 		// wire.c = {0.f,0.f,0.f};
@@ -268,11 +282,15 @@ void scene_structure::emit_particle()
 		// wire.p = particle.p - cgp::vec3{0,3,0};
 		// wire.m = 0.05f;
 		particles.push_back(particle);
-		initialize_wire((particle.l-20.f)/10, particle);
+		initialize_wire((particle.l)/10, particle);
 		// int N_sample = (particle.l-40.f)/10;
 		
-	
+		if(particles.size()<550)
+		timer.event_period= 0.02f;
+		if(particles.size()==560) timer.event_period = 1.f;
+
 		// std::cout<<"size compare: "<<particles.size()<<" "<<wires.size()<<std::endl;
+		
 	}
 }
 
