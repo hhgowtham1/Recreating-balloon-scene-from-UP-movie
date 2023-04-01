@@ -1,5 +1,4 @@
-# UP-balloon-scene
-#Works with CGP instructions
+# UP-balloon-scene works with CGP instructions
 After compiling and running the program, Please adjust the camera and move the time scale slider to 1
 
 
