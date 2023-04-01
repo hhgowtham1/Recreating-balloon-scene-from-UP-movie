@@ -1,4 +1,4 @@
-#UP-balloon-scene
+# UP-balloon-scene
 This was an individual project created as part of Computer animation course over the base code (Lab assignments) provided by Prof. Damien Rohmer works with CGP library.
 After compiling and running the program, Please adjust the camera and move the time scale slider to 1
 
