@@ -20,12 +20,7 @@ struct house_structure
 {
     cgp::vec3 p; // Position
     cgp::vec3 v; // Speed
-    // cgp::vec3 f; // Forces acting on the house(chimney)
-    // cgp::vec3 c; // Color
-    // float r;     // Radius
     float m;     // mass
-
-    // wire_structure wire;
 };
 
 
@@ -44,12 +39,10 @@ struct position_contraint {
 struct constraint_structure
 {
 	float ground_z = 0.0f;                                   // Height of the flood
-	// sphere_parameter sphere = { {0.1f, 0.5f, 0.0f}, 0.15f }; // Colliding sphere
 	
 	std::map<size_t, position_contraint> fixed_sample; // Storage of all fixed position of the wire
 
 	// Add a new fixed position
-	// void add_fixed_position(int ku, wire_structure const& wire);
 	void add_fixed_position(int ku, particle_structure const& balloon);
     void add_fixed_position(int ku, cgp::vec3 const& v);
 	// Remove a fixed position
@@ -83,7 +76,7 @@ struct wire_structure_drawable
 {
     cgp::curve_drawable drawable;
 
-    void initialize(int N_sample_edge, cgp::vec3 initial_pos);
+    void initialize(cgp::vec3 initial_pos);
     void update(wire_structure const& wire);
 };
 
@@ -97,12 +90,6 @@ struct simulation_parameters
     float mass_total = 0.1f; // total mass of the wire
     float K = 5.0f;         // stiffness parameter
     float mu = 15.0f;        // damping parameter
-
-    //  Wind magnitude and direction
-    struct {
-        float magnitude = 1.0f;
-        cgp::vec3 direction = { 0,-1,0 };
-    } wind;
 };
 
 
@@ -113,7 +100,7 @@ void simulation_compute_force(wire_structure& wire, simulation_parameters const&
 void simulation_numerical_integration(wire_structure& wire, simulation_parameters const& parameters, float dt);
 
 // Apply the constraints (fixed position, obstacles) on the wire position and velocity
-void simulation_apply_constraints(wire_structure& wire, constraint_structure const& constraint, particle_structure& particle);
+void simulation_apply_constraints(wire_structure& wire, constraint_structure const& constraint);
 
 // Helper function that tries to detect if the simulation diverged 
 bool simulation_detect_divergence(wire_structure const& wire);
