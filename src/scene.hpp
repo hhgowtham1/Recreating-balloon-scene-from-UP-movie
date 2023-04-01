@@ -73,7 +73,7 @@ void initialize_wire(int N_sample, particle_structure &particle);
 	void idle_frame();
 
 	void emit_particle();
-	void simulation_step(float dt);
+	// void simulation_step(float dt);
 	
 	void balloon_display();
 	void house_display();
